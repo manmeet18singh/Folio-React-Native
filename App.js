@@ -19,7 +19,7 @@ export default class App extends React.Component {
     };
 
     // uncomment this if you'd like to require a login every time the app is started
-    SecureStore.deleteItemAsync("session");
+    // SecureStore.deleteItemAsync("session");
   }
   componentDidMount() {
     // Check if there's a session when the app loads
