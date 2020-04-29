@@ -4,11 +4,16 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import BottomTabNavigator from "./navigation/BottomTabNavigator";
-import LoginScreen from "./screens/LoginScreen";
+import SignUpScreen from "./screens/SignUpScreen";
 
 import * as SecureStore from "expo-secure-store";
+import LoginScreen from "./screens/LoginScreen";
+import ForgotPassScreen from "./screens/ForgotPassScreen";
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator({
+  LoginScreen: LoginScreen,
+  ForgotPassScreen: ForgotPassScreen,
+});
 
 export default class App extends React.Component {
   constructor() {
@@ -49,8 +54,8 @@ export default class App extends React.Component {
               <Stack.Screen name="Root" component={BottomTabNavigator} />
             ) : (
               <Stack.Screen
-                name="Login"
-                component={LoginScreen}
+                name="Folio"
+                component={SignUpScreen}
                 initialParams={{
                   onLoggedIn: () => this.checkIfLoggedIn(),
                 }}

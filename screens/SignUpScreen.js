@@ -5,82 +5,104 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  KeyboardAvoidingView,
 } from "react-native";
 import { Image } from "react-native";
-import * as SecureStore from "expo-secure-store";
 import { LinearGradient } from "expo-linear-gradient";
 
-export default class LoginScreen extends React.Component {
+export default class SignUpScreen extends React.Component {
   constructor(props) {
     super(props);
-
-    // Initialize our login state
     this.state = {
       email: "",
-      password: "",
+      validEmail: true,
+      errorMessage: "",
+      successMessage: "",
     };
-
-    // console.log(props);
   }
 
-  // validate = (inputed, type) => {
-  //   if (type == "email") {
-  //   }
-  //   else if (type == "password")
-  // };
+  validate(text) {
+    emailRegex = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
 
-  login = () => {
-    const { email, password } = this.state;
+    if (emailRegex.test(text)) {
+      this.setState({
+        validEmail: true,
+        errorMessage: "",
+      });
+    } else {
+      this.setState({
+        validEmail: false,
+        errorMessage: "Invalid Email",
+      });
+    }
+  }
 
-    fetch("http://stark.cse.buffalo.edu/cse410/atam/api/SocialAuth.php", {
-      method: "POST",
+  createAccount = () => {
+    //make the api call to the authentication page
+    fetch("http://stark.cse.buffalo.edu/cse410/atam/api/usercontroller.php", {
+      method: "post",
       body: JSON.stringify({
-        action: "login",
-        username: email,
-        password,
+        action: "getUsers",
+        emailaddr: this.state.email,
       }),
     })
-      .then((response) => response.json())
-      .then((json) => {
-        console.log(
-          `Logging in with session token: ${json.user.session_token}`
-        );
-
-        // enter login logic here
-        SecureStore.setItemAsync("session", json.user.session_token).then(
-          () => {
-            this.props.route.params.onLoggedIn();
-          }
-        );
+      .then((res) => res.json())
+      .then((result) => {
+        if (result.users) {
+          this.setState({
+            errorMessage: "A user with that email already exists!",
+          });
+        } else {
+          return fetch(
+            "http://stark.cse.buffalo.edu/cse410/atam/api/SocialAuth.php",
+            {
+              method: "post",
+              body: JSON.stringify({
+                action: "register",
+                email_addr: this.state.email,
+              }),
+            }
+          )
+            .then((resp) => resp.json())
+            .then((response) => {
+              this.setState({
+                successMessage: response.message,
+              });
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
       });
   };
 
-  forgotPass = () => {};
-
   render() {
-    const { email, password } = this.state;
+    const email = this.state;
     return (
-      <View style={styles.container}>
+      <KeyboardAvoidingView style={styles.container} behavior="padding">
         <Image
           source={require("../assets/images/logo.png")}
           style={styles.logo}
         />
+        <Text style={styles.tagline}>
+          Sign up and start your very own professional portfolio
+        </Text>
         <TextInput
-          style={styles.input}
-          onChangeText={(text) => this.validate(text, "email")}
+          style={[
+            styles.input,
+            !this.state.validEmail ? styles.inputError : null,
+          ]}
+          onChangeText={(text) => this.validate(text)}
           placeholder="Email Address"
           value={email}
           textContentType="emailAddress"
         />
-        <TextInput
-          style={styles.input}
-          onChangeText={(text) => this.validate(text, "password")}
-          placeholder="Password"
-          value={password}
-          textContentType="password"
-          secureTextEntry={true}
-        />
-        <View style={styles.buttonContainer}>
+        <Text style={styles.errorMessage}>{this.state.errorMessage}</Text>
+        <KeyboardAvoidingView style={styles.buttonContainer} behavior="padding">
+          {/* SIGN UP */}
           <LinearGradient
             colors={["#3399CC", "#4C518C"]}
             start={{ x: 0.0, y: 1.0 }}
@@ -89,11 +111,12 @@ export default class LoginScreen extends React.Component {
           >
             <TouchableOpacity
               style={styles.signUpContainer}
-              onPress={() => this.onSubmit()}
+              onPress={() => this.createAccount()}
             >
               <Text style={styles.signUpText}>SIGN UP</Text>
             </TouchableOpacity>
           </LinearGradient>
+          {/* LOGIN BUTTON */}
           <LinearGradient
             colors={["#eca400", "#da2c38"]}
             start={{ x: 0.0, y: 1.0 }}
@@ -102,22 +125,17 @@ export default class LoginScreen extends React.Component {
           >
             <TouchableOpacity
               style={styles.loginContainer}
-              onPress={() => this.onSubmit()}
+              onPress={() => this.props.navigation.navigate("LoginScreen")}
             >
               <Text style={styles.loginText}>LOGIN</Text>
             </TouchableOpacity>
           </LinearGradient>
-        </View>
-        <Button
-          title="Forgot Password?"
-          onPress={() => this.props.navigation.navigate("ForgotPassScreen")}
-        />
-      </View>
+        </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
     );
   }
 }
 
-// Our stylesheet, referenced by using styles.container or styles.loginText (style.property)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -125,24 +143,34 @@ const styles = StyleSheet.create({
     padding: 30,
   },
   logo: {
-    // flex: 1,
     alignSelf: "center",
     width: 210,
     height: 130,
     resizeMode: "contain",
     marginBottom: 40,
   },
+  tagline: {
+    paddingBottom: 25,
+    fontSize: 20,
+    textAlign: "center",
+  },
   input: {
     height: 50,
     borderColor: "#DBDBDB",
     borderWidth: 1,
-    marginBottom: 20,
     borderRadius: 5,
     padding: 10,
+  },
+  inputError: {
+    borderColor: "#DA2C38",
+  },
+  errorMessage: {
+    color: "#DA2C38",
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
+    paddingTop: 40,
   },
   signUpContainer: {
     width: "95%",
@@ -185,11 +213,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 10,
     alignSelf: "flex-start",
-  },
-  forgot: {
-    padding: 30,
-    alignSelf: "center",
-    fontSize: 20,
-    fontWeight: "bold",
   },
 });

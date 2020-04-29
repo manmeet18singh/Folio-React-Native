@@ -10,7 +10,7 @@ import { Image } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { LinearGradient } from "expo-linear-gradient";
 
-export default class LoginScreen extends React.Component {
+export default class ForgotPassScreen extends React.Component {
   constructor(props) {
     super(props);
 
