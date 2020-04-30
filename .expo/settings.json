@@ -3,6 +3,6 @@
   "lanType": "ip",
   "dev": true,
   "minify": false,
-  "urlRandomness": "dg-idr",
+  "urlRandomness": "se-fca",
   "https": true
 }

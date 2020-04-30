@@ -2,7 +2,6 @@ import * as React from "react";
 import {
   StyleSheet,
   Text,
-  View,
   TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
@@ -20,19 +19,20 @@ export default class SignUpScreen extends React.Component {
       successMessage: "",
     };
   }
-
   validate(text) {
-    emailRegex = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+    let emailRegex = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
 
     if (emailRegex.test(text)) {
       this.setState({
         validEmail: true,
         errorMessage: "",
+        email: text,
       });
     } else {
       this.setState({
         validEmail: false,
         errorMessage: "Invalid Email",
+        email: text,
       });
     }
   }
@@ -69,18 +69,13 @@ export default class SignUpScreen extends React.Component {
                 successMessage: response.message,
               });
             })
-            .catch((err) => {
-              console.error(err);
-            });
+            .catch((err) => {});
         }
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => {});
   };
 
   render() {
-    const email = this.state;
     return (
       <KeyboardAvoidingView style={styles.container} behavior="padding">
         <Image
@@ -97,11 +92,24 @@ export default class SignUpScreen extends React.Component {
           ]}
           onChangeText={(text) => this.validate(text)}
           placeholder="Email Address"
-          value={email}
           textContentType="emailAddress"
         />
         <Text style={styles.errorMessage}>{this.state.errorMessage}</Text>
         <KeyboardAvoidingView style={styles.buttonContainer} behavior="padding">
+          {/* LOGIN BUTTON */}
+          <LinearGradient
+            colors={["#eca400", "#da2c38"]}
+            start={{ x: 0.0, y: 1.0 }}
+            end={{ x: 1.0, y: 1.0 }}
+            style={styles.loginBtn}
+          >
+            <TouchableOpacity
+              style={styles.loginContainer}
+              onPress={() => this.props.navigation.navigate("Login")}
+            >
+              <Text style={styles.loginText}>LOGIN</Text>
+            </TouchableOpacity>
+          </LinearGradient>
           {/* SIGN UP */}
           <LinearGradient
             colors={["#3399CC", "#4C518C"]}
@@ -114,20 +122,6 @@ export default class SignUpScreen extends React.Component {
               onPress={() => this.createAccount()}
             >
               <Text style={styles.signUpText}>SIGN UP</Text>
-            </TouchableOpacity>
-          </LinearGradient>
-          {/* LOGIN BUTTON */}
-          <LinearGradient
-            colors={["#eca400", "#da2c38"]}
-            start={{ x: 0.0, y: 1.0 }}
-            end={{ x: 1.0, y: 1.0 }}
-            style={styles.loginBtn}
-          >
-            <TouchableOpacity
-              style={styles.loginContainer}
-              onPress={() => this.props.navigation.navigate("LoginScreen")}
-            >
-              <Text style={styles.loginText}>LOGIN</Text>
             </TouchableOpacity>
           </LinearGradient>
         </KeyboardAvoidingView>
@@ -170,7 +164,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingTop: 40,
+    paddingTop: 10,
   },
   signUpContainer: {
     width: "95%",

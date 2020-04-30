@@ -10,10 +10,7 @@ import * as SecureStore from "expo-secure-store";
 import LoginScreen from "./screens/LoginScreen";
 import ForgotPassScreen from "./screens/ForgotPassScreen";
 
-const Stack = createStackNavigator({
-  LoginScreen: LoginScreen,
-  ForgotPassScreen: ForgotPassScreen,
-});
+const Stack = createStackNavigator();
 
 export default class App extends React.Component {
   constructor() {
@@ -54,13 +51,18 @@ export default class App extends React.Component {
               <Stack.Screen name="Root" component={BottomTabNavigator} />
             ) : (
               <Stack.Screen
-                name="Folio"
+                name="Sign Up"
                 component={SignUpScreen}
-                initialParams={{
-                  onLoggedIn: () => this.checkIfLoggedIn(),
-                }}
               />
             )}
+            <Stack.Screen
+              name="Login"
+              component={LoginScreen}
+              initialParams={{
+                onLoggedIn: () => this.checkIfLoggedIn(),
+              }}
+            />
+            <Stack.Screen name="Forgot Password" component={ForgotPassScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </View>
