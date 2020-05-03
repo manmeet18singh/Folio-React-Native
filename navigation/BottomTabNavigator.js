@@ -1,9 +1,11 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import * as React from "react";
+import { Image, StyleSheet } from "react-native";
 
 import TabBarIcon from "../components/TabBarIcon";
 import HomeScreen from "../screens/HomeScreen";
 import LinksScreen from "../screens/LinksScreen";
+import NewPostScreen from "../screens/NewPostScreen";
 
 const BottomTab = createBottomTabNavigator();
 const INITIAL_ROUTE_NAME = "Home";
@@ -22,7 +24,17 @@ export default function BottomTabNavigator({ navigation, route }) {
         options={{
           title: "Home",
           tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused} name="md-code-working" />
+            <TabBarIcon focused={focused} name="home" />
+          ),
+        }}
+      />
+      <BottomTab.Screen
+        name="New Post"
+        component={NewPostScreen}
+        options={{
+          title: "New Post",
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon focused={focused} name="pluscircleo" />
           ),
         }}
       />
@@ -32,7 +44,7 @@ export default function BottomTabNavigator({ navigation, route }) {
         options={{
           title: "Profile",
           tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused} name="md-book" />
+            <TabBarIcon focused={focused} name="smileo" />
           ),
         }}
       />
@@ -46,8 +58,10 @@ function getHeaderTitle(route) {
 
   switch (routeName) {
     case "Home":
-      return "How to get started";
+      return "Home";
     case "Links":
-      return "Links to learn more";
+      return "Profile";
+    case "New Post":
+      return "New Post";
   }
 }

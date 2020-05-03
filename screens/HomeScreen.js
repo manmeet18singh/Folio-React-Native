@@ -1,4 +1,3 @@
-import * as WebBrowser from "expo-web-browser";
 import * as React from "react";
 import {
   Image,
@@ -8,29 +7,62 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
 
 import { MonoText } from "../components/StyledText";
+import PostingList from "../components/PostingList.js";
 
 export default class HomeScreen extends React.Component {
   constructor() {
     super();
 
-    console.log("HI! I need some state here so I can show lots of posts!");
+    this.state = {
+      isLoaded: true,
+      posts: [],
+      error: null,
+    };
   }
+
+  componentDidMount() {
+    this.loadPosts();
+  }
+
+  loadPosts = () => {
+    fetch("http://stark.cse.buffalo.edu/cse410/atam/api/postcontroller.php", {
+      method: "post",
+      body: JSON.stringify({
+        action: "getPosts",
+      }),
+    })
+      .then((res) => res.json())
+      .then(
+        (result) => {
+          if (result.posts) {
+            this.setState({
+              isLoaded: true,
+              posts: result.posts,
+            });
+          }
+        },
+        (error) => {
+          this.setState({
+            isLoaded: true,
+            error: error,
+          });
+        }
+      );
+    setTimeout(() => {
+      this.loadPosts();
+    }, 60000);
+  };
 
   render() {
     return (
       <View style={styles.container}>
-        <ScrollView
-          style={styles.container}
-          contentContainerStyle={styles.contentContainer}
-        >
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Card Title</Text>
-            <Text style={styles.cardDescription}>Card Description</Text>
-          </View>
-        </ScrollView>
+        <PostingList
+          posts={this.state.posts}
+          error={this.state.error}
+          isLoaded={this.state.isLoaded}
+        />
       </View>
     );
   }
@@ -48,22 +80,22 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 20,
   },
-  card: {
-    width: "100%",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 2,
-    elevation: 2,
-    backgroundColor: "white",
-    padding: 10,
-    marginBottom: 10,
-  },
-  cardTitle: {
-    fontSize: 20,
-    marginBottom: 10,
-  },
-  cardDescription: {
-    fontSize: 12,
-  },
+  // card: {
+  //   width: "100%",
+  //   shadowColor: "#000",
+  //   shadowOffset: { width: 0, height: 2 },
+  //   shadowOpacity: 0.5,
+  //   shadowRadius: 2,
+  //   elevation: 2,
+  //   backgroundColor: "white",
+  //   padding: 10,
+  //   marginBottom: 10,
+  // },
+  // cardTitle: {
+  //   fontSize: 20,
+  //   marginBottom: 10,
+  // },
+  // cardDescription: {
+  //   fontSize: 12,
+  // },
 });

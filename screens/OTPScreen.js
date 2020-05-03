@@ -11,7 +11,7 @@ import { Image } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as SecureStore from "expo-secure-store";
 
-export default class SignUpScreen extends React.Component {
+export default class OTPScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -20,51 +20,94 @@ export default class SignUpScreen extends React.Component {
       errorMessage: "",
       password: "",
       loginMessage: "",
+      otp: "",
+      confirmpass: "",
     };
   }
-  validate(text) {
+  validate(text, confirmPass, type) {
     let emailRegex = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
-
-    if (emailRegex.test(text)) {
-      this.setState({
-        validEmail: true,
-        errorMessage: "",
-        email: text,
-      });
+    if (type == "email") {
+      if (emailRegex.test(text)) {
+        this.setState({
+          validEmail: true,
+          errorMessage: "",
+          email: text,
+        });
+      } else {
+        this.setState({
+          validEmail: false,
+          errorMessage: "Invalid Email",
+          email: "",
+        });
+      }
     } else {
-      this.setState({
-        validEmail: false,
-        errorMessage: "Invalid Email",
-        email: text,
-      });
+      if (text == confirmPass) {
+        this.setState({
+          errorMessage: "",
+          password: text,
+          confirmpass: confirmPass,
+        });
+      } else {
+        this.setState({
+          errorMessage: "Your Passwords Don't Match",
+          password: "",
+          confirmpass: "",
+        });
+      }
     }
   }
 
-  login = () => {
+  setPass = () => {
+    //keep the form from actually submitting
+
+    //make the api call to the authentication page
     fetch("http://stark.cse.buffalo.edu/cse410/atam/api/SocialAuth.php", {
       method: "post",
       body: JSON.stringify({
-        action: "login",
-        username: this.state.email,
-        password: this.state.password,
+        action: "setpassword",
+        email_addr: this.state.email,
+        token: this.state.otp,
+        newpassword: this.state.password,
+        confirmpassword: this.state.confirmpass,
       }),
     })
       .then((res) => res.json())
-      .then((result) => {
-        if (result.user) {
-          SecureStore.setItemAsync("session", result.user.session_token).then(
-            () => {
-              SecureStore.setItemAsync("user", result.user.user_id).then(() => {
-                this.props.checkIfLoggedIn();
-              });
+      .then(
+        (result) => {
+          return fetch(
+            "http://stark.cse.buffalo.edu/cse410/atam/api/SocialAuth.php",
+            {
+              method: "post",
+              body: JSON.stringify({
+                action: "login",
+                username: this.state.email,
+                password: this.state.password,
+              }),
             }
-          );
-        } else {
-          this.setState({
-            loginMessage: result.message,
-          });
-        }
-      });
+          )
+            .then((res) => res.json())
+            .then((result) => {
+              if (result.user) {
+                SecureStore.setItemAsync(
+                  "session",
+                  result.user.session_token
+                ).then(() => {
+                  SecureStore.setItemAsync("user", result.user.user_id).then(
+                    () => {
+                      this.props.route.params.onLoggedIn();
+                      this.props.navigation.navigate("Root");
+                    }
+                  );
+                });
+              } else {
+                this.setState({
+                  loginMessage: result.message,
+                });
+              }
+            });
+        },
+        (error) => {}
+      );
   };
 
   render() {
@@ -87,7 +130,21 @@ export default class SignUpScreen extends React.Component {
         <TextInput
           style={styles.input}
           onChangeText={(text) => this.setState({ password: text })}
+          placeholder="OTP"
+        />
+        <Text style={styles.errorMessage}>{this.state.loginMessage}</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={(text) => this.setState({ password: text })}
           placeholder="Password"
+          textContentType="password"
+          secureTextEntry={true}
+        />
+        <Text style={styles.errorMessage}>{this.state.loginMessage}</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={(text) => this.setState({ password: text })}
+          placeholder="Confirm Password"
           textContentType="password"
           secureTextEntry={true}
         />
@@ -103,16 +160,10 @@ export default class SignUpScreen extends React.Component {
               style={styles.loginContainer}
               onPress={() => this.login()}
             >
-              <Text style={styles.loginText}>LOGIN</Text>
+              <Text style={styles.loginText}>Let's Start!</Text>
             </TouchableOpacity>
           </LinearGradient>
         </KeyboardAvoidingView>
-        <Text
-          style={styles.forgot}
-          onPress={() => this.props.navigation.navigate("Forgot Password")}
-        >
-          Forgot Password?
-        </Text>
       </KeyboardAvoidingView>
     );
   }

@@ -125,6 +125,12 @@ export default class SignUpScreen extends React.Component {
             </TouchableOpacity>
           </LinearGradient>
         </KeyboardAvoidingView>
+        <Text
+          style={styles.otp}
+          onPress={() => this.props.navigation.navigate("OTP")}
+        >
+          Have a One Time Password?
+        </Text>
       </KeyboardAvoidingView>
     );
   }
@@ -207,5 +213,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 10,
     alignSelf: "flex-start",
+  },
+  otp: {
+    padding: 25,
+    alignSelf: "center",
+    fontSize: 20,
+    fontWeight: "bold",
   },
 });

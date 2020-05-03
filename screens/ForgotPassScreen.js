@@ -37,46 +37,26 @@ export default class ForgotPassScreen extends React.Component {
     }
   }
 
-  sendOTP = () => {
+  forgotPassword = () => {
+    //keep the form from actually submitting
+    event.preventDefault();
     //make the api call to the authentication page
-    fetch("http://stark.cse.buffalo.edu/cse410/atam/api/usercontroller.php", {
+    fetch("http://stark.cse.buffalo.edu/cse410/atam/api/SocialAuth.php", {
       method: "post",
       body: JSON.stringify({
-        action: "getUsers",
-        emailaddr: this.state.email,
+        action: "forgotpassword",
+        email_addr: this.state.email,
       }),
     })
       .then((res) => res.json())
-      .then((result) => {
-        if (result.users) {
-          return fetch(
-            "http://stark.cse.buffalo.edu/cse410/atam/api/SocialAuth.php",
-            {
-              method: "post",
-              body: JSON.stringify({
-                action: "forgotpassword",
-                email_addr: this.state.email,
-              }),
-            }
-          )
-            .then((res) => res.json())
-            .then(
-              (result) => {
-                this.setState({
-                  errorMessage: result.message,
-                });
-              },
-              (error) => {
-                alert("error!");
-              }
-            );
-        } else {
+      .then(
+        (result) => {
           this.setState({
-            errorMessage: "A user with that email doesn't exist!",
+            errorMessage: result.message,
           });
-        }
-      })
-      .catch((err) => {});
+        },
+        (error) => {}
+      );
   };
 
   render() {
@@ -109,7 +89,7 @@ export default class ForgotPassScreen extends React.Component {
           >
             <TouchableOpacity
               style={styles.otpContainer}
-              onPress={() => this.sendOTP()}
+              onPress={() => this.forgotPassword()}
             >
               <Text style={styles.otpText}>SEND OTP</Text>
             </TouchableOpacity>

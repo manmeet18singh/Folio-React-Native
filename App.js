@@ -9,6 +9,7 @@ import SignUpScreen from "./screens/SignUpScreen";
 import * as SecureStore from "expo-secure-store";
 import LoginScreen from "./screens/LoginScreen";
 import ForgotPassScreen from "./screens/ForgotPassScreen";
+import OTPScreen from "./screens/OTPScreen";
 
 const Stack = createStackNavigator();
 
@@ -35,6 +36,9 @@ export default class App extends React.Component {
         session: sessionToken,
       });
     });
+    // SecureStore.getItemAsync("user").then((userId) => {
+
+    // });
   };
 
   render() {
@@ -50,10 +54,7 @@ export default class App extends React.Component {
             {session ? (
               <Stack.Screen name="Root" component={BottomTabNavigator} />
             ) : (
-              <Stack.Screen
-                name="Sign Up"
-                component={SignUpScreen}
-              />
+              <Stack.Screen name="Sign Up" component={SignUpScreen} />
             )}
             <Stack.Screen
               name="Login"
@@ -63,6 +64,7 @@ export default class App extends React.Component {
               }}
             />
             <Stack.Screen name="Forgot Password" component={ForgotPassScreen} />
+            <Stack.Screen name="OTP" component={OTPScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </View>
