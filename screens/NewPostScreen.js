@@ -8,20 +8,26 @@ import {
 } from "react-native";
 
 import { Picker } from "@react-native-community/picker";
+import { LinearGradient } from "expo-linear-gradient";
+import * as SecureStore from "expo-secure-store";
 
 export default class NewPostScreen extends React.Component {
   constructor() {
     super();
 
     this.state = {
+      userID: "",
+      token: "",
       title: "",
       caption: "",
       tag: "",
       url: "",
       isDisabled: true,
-      completedTitle: "",
-      completedCaption: "",
-      completedTag: "",
+      completedTitle: true,
+      completedCaption: true,
+      completedTag: true,
+      completedUrl: true,
+      validUrl: true,
       errorTitle: "",
       errorCaption: "",
       errorTag: "",
@@ -29,44 +35,129 @@ export default class NewPostScreen extends React.Component {
     };
   }
 
-  validate(text) {
+  componentDidMount() {
+    SecureStore.getItemAsync("user").then((userId) => {
+      this.setState({
+        userID: userId,
+      });
+    });
+    SecureStore.getItemAsync("session").then((sesh) => {
+      this.setState({
+        token: sesh,
+      });
+    });
+  }
+
+  validate(text, type) {
     let url = /(?:(?:https?:\/\/))[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b(?:[-a-zA-Z0-9@:%_\+.~#?&\/=]*(\.jpg|\.png|\.jpeg))/g;
+
+    if (type == "title") {
+      if (text != "") {
+        this.setState({
+          completedTitle: true,
+          errorTitle: "",
+          title: text,
+        });
+      } else {
+        this.setState({
+          completedTitle: false,
+          errorTitle: "Can't Leave Blank",
+          title: "",
+        });
+      }
+    } else if (type == "caption") {
+      if (text != "") {
+        this.setState({
+          completedCaption: true,
+          errorCaption: "",
+          caption: text,
+        });
+      } else {
+        this.setState({
+          completedCaption: false,
+          errorCaption: "Can't Leave Blank",
+          caption: "",
+        });
+      }
+    } else if (type == "tag") {
+      if (text != "") {
+        this.setState({
+          completedTag: true,
+          errorTag: "",
+          tag: text,
+        });
+      } else {
+        this.setState({
+          completedTag: false,
+          errorTag: "Can't Leave Blank",
+          tag: "",
+        });
+      }
+    } else if (type == "url") {
+      if (text != "") {
+        this.setState({
+          completedUrl: true,
+        });
+        if (url.test(text)) {
+          this.setState({
+            validUrl: true,
+            errorUrl: "",
+            url: text,
+          });
+        } else {
+          this.setState({
+            validUrl: false,
+            errorUrl: "Invalid URL",
+            url: "",
+          });
+        }
+      } else {
+        this.setState({
+          completedUrl: false,
+          errorUrl: "Can't Leave Blank",
+          url: "",
+        });
+      }
+    }
   }
 
   createPost = () => {
-    // this.state.title = this.state.title.concat("~@~");
-    // this.state.caption = this.state.title.concat(this.state.caption);
-    // //keep the form from actually submitting
-    // if (formValid(this.state)) {
-    //   //make the api call to the authentication page
-    //   fetch("http://stark.cse.buffalo.edu/cse410/atam/api/postcontroller.php", {
-    //     method: "post",
-    //     body: JSON.stringify({
-    //       action: "addOrEditPosts",
-    //       user_id: sessionStorage.getItem("user"),
-    //       userid: sessionStorage.getItem("user"),
-    //       session_token: sessionStorage.getItem("token"),
-    //       posttext: this.state.caption,
-    //       postpicurl: this.state.url,
-    //       posttype: this.state.tag,
-    //     }),
-    //   })
-    //     .then((res) => res.json())
-    //     .then(
-    //       (result) => {
-    //         this.setState({
-    //           apiReturnMessage: result.Status,
-    //           // post_id: result.Status.slice(-2)
-    //         });
-    //         // this.addTitle();
-    //         // this.addTag();
-    //         this.props.loadPosts();
-    //         this.onClose();
-    //         // window.location.reload(false);
-    //       },
-    //       (error) => {}
-    //     );
-    // }
+    //keep the form from actually submitting
+    this.state.title = this.state.title.concat("~@~");
+    this.state.caption = this.state.title.concat(this.state.caption);
+
+    if (
+      this.state.completedTitle &&
+      this.state.completedCaption &&
+      this.state.completedTag &&
+      this.state.completedUrl &&
+      this.state.validUrl
+    ) {
+      //make the api call to the authentication page
+      fetch("http://stark.cse.buffalo.edu/cse410/atam/api/postcontroller.php", {
+        method: "post",
+        body: JSON.stringify({
+          action: "addOrEditPosts",
+          user_id: this.state.userID,
+          userid: this.state.userID,
+          session_token: this.state.token,
+          posttext: this.state.caption,
+          postpicurl: this.state.url,
+          posttype: this.state.tag,
+        }),
+      })
+        .then((res) => res.json())
+        .then(
+          (result) => {
+            this.props.navigation.navigate("Home");
+          },
+          (error) => {}
+        );
+    } else {
+      this.setState({
+        errorUrl: "Can't leave fields empty",
+      });
+    }
   };
 
   render() {
@@ -113,7 +204,7 @@ export default class NewPostScreen extends React.Component {
           <Text style={styles.dataLabel}>Tags: </Text>
           <Picker
             selectedValue={this.state.tag}
-            style={[
+            tyle={[
               styles.input,
               !this.state.completedTag ? styles.inputError : null,
             ]}
@@ -134,22 +225,35 @@ export default class NewPostScreen extends React.Component {
           <TextInput
             style={[
               styles.input,
-              !this.state.completedTitle ? styles.inputError : null,
+              !this.state.completedUrl && !this.validUrl
+                ? styles.inputError
+                : null,
             ]}
             placeholder="URL"
             onChangeText={(text) => this.validate(text, "url")}
           />
           <Text style={styles.errorMessage}>{this.state.errorUrl}</Text>
         </View>
-        <View style={styles.submitButton}>
+        <LinearGradient
+          colors={["#eca400", "#da2c38"]}
+          start={{ x: 0.0, y: 1.0 }}
+          end={{ x: 1.0, y: 1.0 }}
+          style={styles.postBtn}
+        >
           <TouchableOpacity
-            disabled={this.state.isDisabled}
-            style={styles.button}
-            onPress={this.createPost()}
+            style={styles.postContainer}
+            onPress={() => this.createPost()}
+            // disabled={
+            //   this.state.completedTitle &&
+            //   this.state.completedCaption &&
+            //   this.state.completedTag &&
+            //   this.state.completedUrl &&
+            //   this.state.validUrl
+            // }
           >
-            <Text style={styles.buttonText}>POST</Text>
+            <Text style={styles.postBtnText}>POST</Text>
           </TouchableOpacity>
-        </View>
+        </LinearGradient>
       </View>
     );
   }
@@ -172,8 +276,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginBottom: 10,
   },
-  submitButton: {},
-  errorMessage: {},
+  errorMessage: {
+    color: "#DA2C38",
+    padding: 5,
+  },
   input: {
     height: 50,
     borderColor: "#DBDBDB",
@@ -181,11 +287,28 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
   },
-  inputError: {},
-  button: {},
-  buttonText: {},
-  errorTitle: {},
-  errorCaption: {},
-  errorTag: {},
-  errorUrl: {},
+  inputError: {
+    borderColor: "#DA2C38",
+  },
+  postContainer: {
+    width: "98%",
+    height: "85%",
+    borderRadius: 6,
+    backgroundColor: "white",
+    alignItems: "center",
+  },
+  postBtnText: {
+    textAlign: "center",
+    color: "#eca400",
+    padding: 6,
+    fontSize: 20,
+  },
+  postBtn: {
+    height: 50,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10,
+    alignSelf: "flex-end",
+  },
 });

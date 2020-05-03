@@ -96,20 +96,6 @@ export default class SignUpScreen extends React.Component {
         />
         <Text style={styles.errorMessage}>{this.state.errorMessage}</Text>
         <KeyboardAvoidingView style={styles.buttonContainer} behavior="padding">
-          {/* LOGIN BUTTON */}
-          <LinearGradient
-            colors={["#eca400", "#da2c38"]}
-            start={{ x: 0.0, y: 1.0 }}
-            end={{ x: 1.0, y: 1.0 }}
-            style={styles.loginBtn}
-          >
-            <TouchableOpacity
-              style={styles.loginContainer}
-              onPress={() => this.props.navigation.navigate("Login")}
-            >
-              <Text style={styles.loginText}>LOGIN</Text>
-            </TouchableOpacity>
-          </LinearGradient>
           {/* SIGN UP */}
           <LinearGradient
             colors={["#3399CC", "#4C518C"]}
@@ -173,14 +159,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   signUpContainer: {
-    width: "95%",
-    height: "85%",
-    borderRadius: 5,
-    backgroundColor: "white",
-    alignItems: "center",
-  },
-  loginContainer: {
-    width: "95%",
+    width: "98%",
     height: "85%",
     borderRadius: 5,
     backgroundColor: "white",
@@ -192,23 +171,9 @@ const styles = StyleSheet.create({
     padding: 6,
     fontSize: 20,
   },
-  loginText: {
-    textAlign: "center",
-    color: "#eca400",
-    padding: 6,
-    fontSize: 20,
-  },
-  loginBtn: {
-    height: 50,
-    width: "45%",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 10,
-    alignSelf: "flex-end",
-  },
   signUpBtn: {
     height: 50,
-    width: "45%",
+    width: "100%",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,

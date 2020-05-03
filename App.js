@@ -36,15 +36,11 @@ export default class App extends React.Component {
         session: sessionToken,
       });
     });
-    // SecureStore.getItemAsync("user").then((userId) => {
-
-    // });
   };
 
   render() {
     // get our session variable from the state
     const { session } = this.state;
-
     return (
       <View style={styles.container}>
         {Platform.OS === "ios" && <StatusBar barStyle="default" />}
@@ -54,15 +50,16 @@ export default class App extends React.Component {
             {session ? (
               <Stack.Screen name="Root" component={BottomTabNavigator} />
             ) : (
-              <Stack.Screen name="Sign Up" component={SignUpScreen} />
+              <Stack.Screen
+                name="LoginScreen"
+                component={LoginScreen}
+                initialParams={{
+                  onLoggedIn: () => this.checkIfLoggedIn(),
+                }}
+              />
             )}
-            <Stack.Screen
-              name="Login"
-              component={LoginScreen}
-              initialParams={{
-                onLoggedIn: () => this.checkIfLoggedIn(),
-              }}
-            />
+
+            <Stack.Screen name="Sign Up" component={SignUpScreen} />
             <Stack.Screen name="Forgot Password" component={ForgotPassScreen} />
             <Stack.Screen name="OTP" component={OTPScreen} />
           </Stack.Navigator>

@@ -55,7 +55,7 @@ export default class SignUpScreen extends React.Component {
           SecureStore.setItemAsync("session", result.user.session_token).then(
             () => {
               SecureStore.setItemAsync("user", result.user.user_id).then(() => {
-                this.props.checkIfLoggedIn();
+                this.props.route.params.onLoggedIn();
               });
             }
           );
@@ -93,6 +93,22 @@ export default class SignUpScreen extends React.Component {
         />
         <Text style={styles.errorMessage}>{this.state.loginMessage}</Text>
         <KeyboardAvoidingView style={styles.buttonContainer}>
+          {/* SIGN UP */}
+          <LinearGradient
+            colors={["#3399CC", "#4C518C"]}
+            start={{ x: 0.0, y: 1.0 }}
+            end={{ x: 1.0, y: 1.0 }}
+            style={styles.signUpBtn}
+          >
+            <TouchableOpacity
+              style={styles.signUpContainer}
+              onPress={() => this.props.navigation.navigate("Sign Up")}
+            >
+              <Text style={styles.signUpText}>SIGN UP</Text>
+            </TouchableOpacity>
+          </LinearGradient>
+
+          {/* LOGIN BUTTON */}
           <LinearGradient
             colors={["#eca400", "#da2c38"]}
             start={{ x: 0.0, y: 1.0 }}
@@ -147,13 +163,28 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
+    justifyContent: "space-between",
+    paddingTop: 10,
   },
-  loginContainer: {
-    width: "98%",
+  signUpContainer: {
+    width: "95%",
     height: "85%",
-    borderRadius: 6,
+    borderRadius: 5,
     backgroundColor: "white",
     alignItems: "center",
+  },
+  loginContainer: {
+    width: "95%",
+    height: "85%",
+    borderRadius: 5,
+    backgroundColor: "white",
+    alignItems: "center",
+  },
+  signUpText: {
+    textAlign: "center",
+    color: "#3399CC",
+    padding: 6,
+    fontSize: 20,
   },
   loginText: {
     textAlign: "center",
@@ -163,11 +194,19 @@ const styles = StyleSheet.create({
   },
   loginBtn: {
     height: 50,
-    width: "100%",
+    width: "45%",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,
     alignSelf: "flex-end",
+  },
+  signUpBtn: {
+    height: 50,
+    width: "45%",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10,
+    alignSelf: "flex-start",
   },
   forgot: {
     padding: 25,

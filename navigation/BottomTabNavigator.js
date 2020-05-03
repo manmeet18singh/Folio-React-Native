@@ -4,7 +4,7 @@ import { Image, StyleSheet } from "react-native";
 
 import TabBarIcon from "../components/TabBarIcon";
 import HomeScreen from "../screens/HomeScreen";
-import LinksScreen from "../screens/LinksScreen";
+import ProfileScreen from "../screens/ProfileScreen";
 import NewPostScreen from "../screens/NewPostScreen";
 
 const BottomTab = createBottomTabNavigator();
@@ -39,8 +39,8 @@ export default function BottomTabNavigator({ navigation, route }) {
         }}
       />
       <BottomTab.Screen
-        name="Links"
-        component={LinksScreen}
+        name="Profile"
+        component={ProfileScreen}
         options={{
           title: "Profile",
           tabBarIcon: ({ focused }) => (
@@ -59,7 +59,7 @@ function getHeaderTitle(route) {
   switch (routeName) {
     case "Home":
       return "Home";
-    case "Links":
+    case "Profile":
       return "Profile";
     case "New Post":
       return "New Post";

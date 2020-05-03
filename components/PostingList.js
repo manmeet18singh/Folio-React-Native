@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ScrollView } from "react-native-gesture-handler";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Text } from "react-native";
 import Post from "./Post";
 
 export default class PostingList extends React.Component {
@@ -16,9 +16,9 @@ export default class PostingList extends React.Component {
     //this.loadPosts();
     const { error, isLoaded, posts } = this.props;
     if (error) {
-      return <div> Error: {error.message} </div>;
+      return <Text>Error: {error.message} </Text>;
     } else if (!isLoaded) {
-      return <div> </div>;
+      return <Text> </Text>;
     } else {
       return (
         <ScrollView
@@ -29,17 +29,6 @@ export default class PostingList extends React.Component {
             <Post key={post.post_id} post={post} type={this.props.type} />
           ))}
         </ScrollView>
-        // <div className="posts">
-        //   {posts.map((post) => (
-        //     <Post
-        //       key={post.post_id}
-        //       post={post}
-        //       type={this.props.type}
-        //       notifcount={this.props.notifcount}
-        //       notificationid={this.props.notificationid}
-        //     />
-        //   ))}
-        // </div>
       );
     }
   }
